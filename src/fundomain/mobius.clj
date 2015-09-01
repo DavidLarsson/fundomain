@@ -1,7 +1,8 @@
 (ns fundomain.mobius
-  (:refer-clojure)
+  (:refer-clojure :exclude [record?])
   (:require [numeric.expresso.core :as sym]
-            [fundomain.cnum :refer [complex? z conjugate abs2] :as c]))
+            [fundomain.cnum :refer [complex? z conjugate abs2] :as c]
+            [fundomain.hyperbolic-geometry :as hyp]))
 
 (defstruct mobius :coeff)
 
@@ -39,8 +40,8 @@
   [f z]
   {:pre [(complex? z)
          (mobius? f)]}
-  (reduce / (map #(c/+ (c/* (first %) z)
-                       (second %)) (:coeff f))))
+  (reduce c// (map #(c/+ (c/* (first %) z)
+                            (second %)) (:coeff f))))
 
 (defn create-mobiusf
   "Create a functional representation of the Möbius transormation accepting a complex number."
@@ -79,3 +80,20 @@
                      (* 2
                         ~(:imag (c/* (conjugate c) d))
                         y)))))))
+
+(defn disc-mobius?
+  "Is the Möbius transformation part of the
+  automorphism group of the hyperbolic disc model?"
+  [mob]
+  {:pre [(mobius? mob)]}
+  (let [[[a b] [c d]] (:coeff mob)]
+    (and (= a (c/conjugate d))
+         (= c (c/- (c/conjugate b)))
+         (= (determinant mob) (z 1)))))
+
+(defn reduction-distance
+  [mob point]
+  {:pre [(disc-mobius? mob)]}
+  (hyp/distance :disc
+                (apply-mobius mob point)
+                (z 0)))
