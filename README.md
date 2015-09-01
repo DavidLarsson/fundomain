@@ -4,29 +4,15 @@ Automating the process of finding fundamental domains for certain Fuchsian group
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download from http://github.com/DavidLarsson/fundomain.
 
 ## Usage
 
-FIXME: explanation
+So far, only some basic functions for setting up data structures and simple computations.
 
-    $ java -jar fundomain-0.1.0-standalone.jar [args]
+## Dependencies
 
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+* expresso: symbolic math library for Clojure.
 
 ## License
 
