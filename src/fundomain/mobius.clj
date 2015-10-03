@@ -17,6 +17,9 @@
                             (c/* b c))))]}
   (struct mobius (vector (vector a b) (vector c d))))
 
+(def mob-id (create-mobius (z 1) (z 0)
+                           (z 0) (z 1)))
+
 (defn determinant
   "The determinant of the matrix representation of the Möbius transformation"
   [{:keys [coeff]}]
@@ -88,7 +91,7 @@
   {:pre [(mobius? mob)]}
   (let [[[a b] [c d]] (:coeff mob)]
     (and (= a (c/conjugate d))
-         (= c (c/- (c/conjugate b)))
+         (= c (c/conjugate b))
          (= (determinant mob) (z 1)))))
 
 (defn reduction-distance
@@ -97,3 +100,26 @@
   (hyp/distance :disc
                 (apply-mobius mob point)
                 (z 0)))
+
+(defn reduce-mobius
+  ([H mob] (reduce-mobius H mob (z 0)))
+  ([H mob point]
+   (loop [gamma-it mob
+          delta-it mob-id]
+     (let [reduced-comp (fn [g]
+                          (reduction-distance
+                           (comp-mobius g gamma-it) point))
+           min-choice (fn [g h]
+                        (if (< (reduced-comp g)
+                               (reduced-comp h))
+                          g
+                          h))
+           gamma-min (reduce min-choice H)
+           red-min (reduced-comp gamma-min)
+           red-gamma (reduction-distance gamma-it point)]
+       (if (<= red-gamma red-min)
+         gamma-it
+         (recur (comp-mobius gamma-min
+                             gamma-it)
+                (comp-mobius gamma-min
+                             delta-it)))))))
